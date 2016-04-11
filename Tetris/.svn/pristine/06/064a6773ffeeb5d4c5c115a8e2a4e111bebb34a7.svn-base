@@ -1,0 +1,276 @@
+/*
+ * TCSS 305 Fall 2015
+ * Assignment 6 - Tetris.
+ */
+
+package view;
+
+import java.awt.Color;
+import java.awt.Component;
+import java.awt.Font;
+import java.util.Observable;
+import java.util.Observer;
+
+import javax.swing.Box;
+import javax.swing.BoxLayout;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+
+import model.Board;
+
+/**
+ * This is the class that displays the Score JPanel.
+ * 
+ * @author Travis Holloway
+ * @version Assignment 6: Tetris, December 1 2015
+ */
+public class ScorePanel extends JPanel implements Observer {
+    
+    /*
+     * ***********************************   CONSTANTS    *************************************
+     */
+    
+    /**
+     * Auto-generated serial ID.
+     */
+    private static final long serialVersionUID = -428301323664751701L;
+    
+    /**
+     * Constant for the displayed string of myClearedLabel.
+     */
+    private static final String CLEARED = "Lines Cleared so far: ";
+    
+    /**
+     * Constant for the size of the Font.
+     */
+    private static final float FONT_SIZE = 16;
+    
+    /**
+     * Constant for the displayed string of myClearedLabel.
+     */
+    private static final String LEVEL = "Current Level is: ";
+    
+    /**
+     * Constant for the score multiplier. Preferred multiples of 10.
+     */
+    private static final int MULTIPLIER = 100;
+    
+    /**
+     * Constant for the displayed string of myClearedLabel.
+     */
+    private static final String REQUIRED = "Required lines before next level: ";
+    
+    /**
+     * Constant for the displayed string of myClearedLabel.
+     */
+    private static final String SCORE = "Total Score is: ";
+    
+    /**
+     * Constant to represent the distance between labels.
+     */
+    private static final int SPACER = 10;
+    
+    /*
+     * *************************************   FIELDS    **************************************
+     */
+    
+    /**
+     * Field to represent the BoardPanel used by the program.
+     */
+    private final BoardPanel myBoardPanel;
+    
+    /**
+     * Field to represent the amount of lines cleared this level.
+     */
+    private int myCleared;
+    
+    /**
+     * Field to represent the Cleared JLabel.
+     */
+    private JLabel myClearedLabel;
+    
+    /**
+     * Field to represent the font used by the panel.
+     */
+    private final Font myFont;
+    
+    /**
+     * Field to represent the current level of the program.
+     */
+    private int myLevel;
+    
+    /**
+     * Field to represent the Level JLabel.
+     */
+    private JLabel myLevelLabel;
+    
+    /**
+     * Field to represent the amount of lines required to clear this level.
+     */
+    private int myRequired;
+    
+    /**
+     * Field to represent the Required JLabel.
+     */
+    private JLabel myRequiredLabel;
+    
+    /**
+     * Field to represent the score for the current game.
+     */
+    private int myScore;
+    
+    /**
+     * Field to represent the Score JLabel.
+     */
+    private JLabel myScoreLabel;
+    
+    /*
+     * **********************************   CONSTRUCTORS    ***********************************
+     */
+
+    /**
+     * Constructor for ScorePanel.
+     * 
+     * @param theBoardPanel the BoardPanel used by the program.
+     * @param theFont The font used by the program, stored in TetrisGui.
+     */
+    public ScorePanel(final BoardPanel theBoardPanel, final Font theFont) {
+        super();
+        myBoardPanel = theBoardPanel;
+        myFont = theFont;
+        myRequired = 1;
+        myLevel = 1;
+        myScore = 0;
+        configurePanel();
+    }
+    
+    /*
+     * *********************************   PUBLIC METHODS    **********************************
+     */   
+
+    /* (non-Javadoc)
+     * @see java.util.Observer#update(java.util.Observable, java.lang.Object)
+     */
+    @Override
+    public void update(final Observable theObservable,
+                       final Object theObject) {
+        /*
+         * If the theObservable is a board and theObject is null, then set myLevel in
+         *  BoardPanel to same as the myLevel in ScorePanel and repaint().
+         */
+        if (theObservable instanceof Board) {
+            /*
+             * If theObject is not null, then it is triggered by a cleared line.
+             */
+            if (theObject != null) {
+                //Increase myCleared and update it's label.
+                myCleared++;
+                myClearedLabel.setText(CLEARED + myCleared);
+                //Run the scoring algorithm and add it to myScore, update it's label.
+                myScore = myLevel * (int) theObject * MULTIPLIER;
+                myScoreLabel.setText(SCORE + myScore);
+                //Use helper method to check if it is time to increase the level.
+                checkMod();
+            }
+            myBoardPanel.setLevel(myLevel);
+            this.repaint();
+        }
+    }
+    
+    /*
+     * *********************************   PRIVATE METHODS    *********************************
+     */
+    
+    /**
+     * Helper method to avoid deeply nested if statements in update.
+     */
+    private void checkMod() {
+        /*
+         * If the line cleared was enough to advance a level 
+         * (myCleared(modulus(myRequired))), and myCleared is greater than 0 
+         * (Prevents it from happening in the beginning) increase the level.
+         */
+        if (myCleared % myRequired == 0 && myCleared > 0) {
+            //Set myCleared to 0 and update it's label.
+            myCleared = 0;
+            myClearedLabel.setText(CLEARED + myCleared);
+            //Increase myLevel and update it's label.
+            myLevel++;
+            myLevelLabel.setText(LEVEL + myLevel);
+            //Increase myRequired and update it's label.
+            myRequired++;
+            myRequiredLabel.setText(REQUIRED + myRequired);
+            //repaint.
+            repaint();
+        }
+    }
+
+    /**
+     * Method to initialize the class fields and configure the JPanel.
+     */
+    private void configurePanel() {
+        setBackground(Color.LIGHT_GRAY);
+        setLayout(new BoxLayout(this, BoxLayout.PAGE_AXIS));
+        
+        createClearedLines();
+        createLevel();
+        createRequiredLines();
+        createScore();
+        
+        /*
+         * Add the labels (for the first vertical strut, add FONT_SIZE to provide a little
+         * extra space between the top of the border and first label.
+         */
+        add(Box.createVerticalStrut((int) (SPACER + FONT_SIZE)));
+        add(myLevelLabel);
+        add(Box.createVerticalStrut(SPACER));
+        add(myRequiredLabel);
+        add(Box.createVerticalStrut(SPACER));
+        add(myClearedLabel);
+        add(Box.createVerticalStrut(SPACER));
+        add(myScoreLabel);
+        add(Box.createVerticalStrut(SPACER));
+    }
+    
+    /**
+     * Method to create and configure a JLabel to display how many lines have
+     * been cleared this level.
+     */
+    private void createClearedLines() {        
+        myClearedLabel =  new JLabel(CLEARED + myCleared);
+        myClearedLabel.setFont(myFont.deriveFont(Font.PLAIN, FONT_SIZE));
+        myClearedLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+        myClearedLabel.setAlignmentY(Component.CENTER_ALIGNMENT);
+    }
+    
+    /**
+     * Method to create and configure a JLabel for the current Level.
+     */
+    private void createLevel() {
+        myLevelLabel = new JLabel(LEVEL + myLevel);
+        myLevelLabel.setFont(myFont.deriveFont(Font.PLAIN, FONT_SIZE));
+        myLevelLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+        myLevelLabel.setAlignmentY(Component.CENTER_ALIGNMENT);
+    }
+    
+    /**
+     * Method to create and configure a JLabel for the current required amount
+     * of lines cleared before next level.
+     */
+    private void createRequiredLines() {
+        myRequiredLabel = new JLabel(REQUIRED + myRequired);
+        myRequiredLabel.setFont(myFont.deriveFont(Font.PLAIN, FONT_SIZE));
+        myRequiredLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+        myRequiredLabel.setAlignmentY(Component.CENTER_ALIGNMENT);
+    }
+    
+    /**
+     * Method to create and configure a JLabel for total Score.
+     */
+    private void createScore() {
+        myScoreLabel = new JLabel(SCORE + myScore);
+        myScoreLabel.setFont(myFont.deriveFont(Font.PLAIN, FONT_SIZE));
+        myScoreLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+        myScoreLabel.setAlignmentY(Component.CENTER_ALIGNMENT);
+    }
+}

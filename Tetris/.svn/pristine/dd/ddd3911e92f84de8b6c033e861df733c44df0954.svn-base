@@ -1,0 +1,151 @@
+/*
+ * TCSS 305 Fall 2015
+ * Assignment 6 - Tetris.
+ */
+
+package view;
+
+import java.awt.Color;
+import java.awt.Dimension;
+import java.awt.Font;
+import java.util.Observable;
+import java.util.Observer;
+
+import javax.swing.BorderFactory;
+import javax.swing.BoxLayout;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.border.Border;
+import javax.swing.border.TitledBorder;
+
+import model.Board;
+
+/**
+ * This is the class that displays the Score JPanel.
+ * 
+ * @author Travis Holloway
+ * @version Assignment 6: Tetris, December 1 2015
+ */
+public class ScorePanel extends JPanel implements Observer {
+    
+    /**
+     * Auto-generated serial ID.
+     */
+    private static final long serialVersionUID = -428301323664751701L;
+    
+    /**
+     * Constant for the starting width of the panel.
+     */
+    private static final int WIDTH = 400;
+    
+    /**
+     * Constant for the starting height of the panel.
+     */
+    private static final int HEIGHT = 254;
+    
+    /**
+     * Field to represent the amount of lines cleared this level.
+     */
+    private int myCleared;
+    
+    /**
+     * Field to represent the current level of the program.
+     */
+    private int myLevel;
+    
+    /**
+     * Field to represent the amount of lines required to clear this level.
+     */
+    private int myRequired;
+
+    /**
+     * Constructor for ScorePanel.
+     */
+    public ScorePanel() {
+        super();
+        configurePanel();
+    }
+
+    /**
+     * Method to initialize the class fields and configure the JPanel.
+     */
+    private void configurePanel() {
+        setSize(new Dimension(WIDTH, HEIGHT));
+        setBackground(Color.LIGHT_GRAY);
+        setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
+        
+        final Border raisedbevel = BorderFactory.createRaisedBevelBorder();
+        final Border loweredbevel = BorderFactory.createLoweredBevelBorder();
+        final Border titled = BorderFactory.createTitledBorder(raisedbevel,
+                                                               "Score",
+                                                               TitledBorder.
+                                                               DEFAULT_JUSTIFICATION,
+                                                               TitledBorder.
+                                                               DEFAULT_POSITION,
+                                                               new Font("times new roman",
+                                                                        Font.PLAIN, 40),
+                                                               Color.BLACK);
+        
+        setBorder(BorderFactory.createCompoundBorder(titled, loweredbevel));
+        
+        //Add the JLabels.
+        add(createLevel());
+        add(createRequiredLines());
+        add(createClearedLines());
+        add(createScore());
+    }
+    
+    /**
+     * Method to create and configure a JLabel for the current Level.
+     * 
+     * @return Returns a JLabel that represents the current level.
+     */
+    public JLabel createLevel() {
+        return new JLabel("Current Level is: " + myLevel);
+    }
+    
+    /**
+     * Method to create and configure a JLabel for the current required amount
+     * of lines cleared before next level.
+     * 
+     * @return Returns a JLabel that represents the required amount of lines
+     * cleared before next level.
+     */
+    public JLabel createRequiredLines() {
+        return new JLabel("Amount of lines required before next level is: "
+                          + myRequired);
+    }
+    
+    /**
+     * Method to create and configure a JLabel to display how many lines have
+     * been cleared this level.
+     * 
+     * @return Returns a JLabel that represents the amount of lines cleared this 
+     * level.
+     */
+    public JLabel createClearedLines() {        
+        return new JLabel("Lines Cleared so far: " + myCleared);
+    }
+    
+    /**
+     * Method to create and configure a JLabel for total Score.
+     * 
+     * @return Returns a JLabel that represents the Total score for this game.
+     */
+    public JLabel createScore() {
+        return new JLabel("Total Score is: " + myCleared);
+    }
+    
+
+    /* (non-Javadoc)
+     * @see java.util.Observer#update(java.util.Observable, java.lang.Object)
+     */
+    @Override
+    public void update(final Observable theObservable,
+                       final Object theObject) {
+        if (theObservable instanceof Board) {
+            repaint();
+        }
+    }
+
+}

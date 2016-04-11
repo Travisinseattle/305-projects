@@ -1,0 +1,286 @@
+/*
+ * TCSS 305 Fall 2015
+ * Assignment 6 - Tetris.
+ */
+
+package view;
+
+import java.awt.BasicStroke;
+import java.awt.Color;
+import java.awt.Font;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.RenderingHints;
+import java.awt.Shape;
+import java.awt.geom.RoundRectangle2D;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Observable;
+import java.util.Observer;
+
+import javax.swing.BorderFactory;
+import javax.swing.JPanel;
+import javax.swing.border.Border;
+import javax.swing.border.TitledBorder;
+
+import model.AbstractPiece;
+import model.Board;
+import model.Piece;
+
+/**
+ * This is the JPanel that displays the next piece.  
+ * 
+ * @author Travis Holloway
+ * @version Assignment 6: Tetris, November 9 2015
+ */
+public class PreviewPanel extends JPanel implements Observer {
+    
+    /*
+     * ***********************************   CONSTANTS    *************************************
+     */
+    
+    /**
+     * Auto-generated serial ID.
+     */
+    private static final long serialVersionUID = 2500924605259207155L;
+    
+    /**
+     * Constant for the number 5, used in changeBlock.
+     */
+    private static final int FIVE = 5;
+    
+    /**
+     * Constant for the starting height of the panel.
+     */
+    private static final int HEIGHT = 254;
+    
+    /**
+     * Constant for the number 6, used in changeBlock.
+     */
+    private static final int SIX = 6;
+    
+    /**
+     * Constant for the starting width of the panel.
+     */
+    private static final int WIDTH = 400;    
+    
+    /*
+     * *************************************   FIELDS    **************************************
+     */
+    
+    /**
+     * Integer field to provide reference to the height of the blocks.
+     */
+    private int myBlockHeight;
+    
+    /**
+     * Integer field to provide reference to the width of the blocks.
+     */
+    private int myBlockWidth;
+    
+    /**
+     * Field that provides a reference to the Board that is being used by
+     * myBoardPanel.
+     */
+    private Board myBoard;
+
+    /**
+     * Field that provides a reference to the Board passed to the 
+     * constructor.
+     */
+    private final BoardPanel myBoardPanel;
+    
+    /**
+     * Field to represent the font used by the panel.
+     */
+    private final Font myFont;
+    
+    /**
+     * Field for the list that holds the shapes that represent the current
+     * piece.  
+     */
+    private List<Shape> myNextBlocks;
+    
+    /*
+     * **********************************   CONSTRUCTORS    ***********************************
+     */
+
+    /**
+     * Constructor for PreviewPanel.
+     * 
+     * @param theBoardPanel A reference to the Board from TetrisGUI.
+     * @param theFont The font used by the program, stored in TetrisGui.
+     */
+    public PreviewPanel(final BoardPanel theBoardPanel, final Font theFont) {
+        super();
+        myBoardPanel = theBoardPanel;
+        myFont = theFont;
+        configurePanel();
+    }
+    
+    /*
+     * *********************************   PUBLIC METHODS    **********************************
+     */
+    
+    /**
+     * Paints the current Board.
+     * 
+     * @param theGraphics The graphics context to use for painting.
+     */
+    public void paintComponent(final Graphics theGraphics) {
+        super.paintComponent(theGraphics);
+        final Graphics2D g2d = (Graphics2D) theGraphics;
+        
+        //clean up the display of the object.
+        g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
+                             RenderingHints.VALUE_ANTIALIAS_ON);
+        /*
+         * Get the current piece, and the frozen blocks. Re-instantiate the list
+         * of the Current piece's block shapes (myCurrentBlocks) to clear it.  Capture
+         * the piece's current coordinates in board coordinates and assign it to myBlocks.
+         */
+        final int[][] blocks = ((AbstractPiece) myBoard.getNextPiece()).getRotation();
+        myNextBlocks = new ArrayList<Shape>();
+        
+        changeBlock();
+        
+        //Call helper methods.        
+        createNextPiece(blocks);
+                
+        /*
+         * Paint each block in myCurrentBlocks.        
+         */
+        for (final Shape temp: myNextBlocks) {
+            final int stroke = 3;
+            g2d.setPaint(Color.RED);
+            g2d.setStroke(new BasicStroke(stroke));
+            g2d.draw(temp);
+            g2d.setPaint(Color.PINK);
+            g2d.fill(temp);
+        }
+    }
+
+    /* (non-Javadoc)
+     * @see java.util.Observer#update(java.util.Observable, java.lang.Object)
+     */
+    @Override
+    public void update(final Observable theObservable,
+                       final Object theObject) {
+        if (theObservable instanceof Board) {
+            repaint();
+        }
+    }
+    
+    /*
+     * ********************************   PRIVATE METHODS    *********************************
+     */
+    
+    /**
+     * Helper Method to choose the block size so that the blocks stay centered.
+     */
+    private void changeBlock() {
+        final Piece piece = myBoard.getNextPiece();
+        
+        switch (((AbstractPiece) piece).getBlock()) {
+            case EMPTY:
+                myBlockWidth = getWidth();
+                myBlockHeight = getHeight();
+                break;
+            case I:
+                myBlockWidth = getWidth() / SIX;
+                myBlockHeight = getHeight() / FIVE;
+                break;           
+            case J:
+                myBlockWidth = getWidth() / FIVE;
+                myBlockHeight = getHeight() / FIVE;
+                break;                
+            case L:
+                myBlockWidth = getWidth() / FIVE;
+                myBlockHeight = getHeight() / FIVE;
+                break;                
+            case O:
+                myBlockWidth = getWidth() / SIX;
+                myBlockHeight = getHeight() / FIVE;
+                break;
+            case S:
+                myBlockWidth = getWidth() / FIVE;
+                myBlockHeight = getHeight() / FIVE;
+                break;            
+            case T:
+                myBlockWidth = getWidth() / FIVE;
+                myBlockHeight = getHeight() / FIVE;
+                break;            
+            case Z:
+                myBlockWidth = getWidth() / FIVE;
+                myBlockHeight = getHeight() / FIVE;
+                break;            
+            default:
+                break;            
+        }
+    }
+    
+    /**
+     * Method to initialize the class fields and configure the JPanel.
+     */
+    private void configurePanel() {
+        myBoard = myBoardPanel.getBoard();
+        setBackground(Color.LIGHT_GRAY);
+        
+        myNextBlocks = new ArrayList<Shape>();
+        //Provide initial values and then call changeBlock to set them correctly.
+        myBlockWidth = WIDTH;
+        myBlockHeight = HEIGHT;
+        changeBlock();
+        
+        final Border raisedbevel = BorderFactory.createRaisedBevelBorder();
+        final Border loweredbevel = BorderFactory.createLoweredBevelBorder();
+        final Border titled = BorderFactory.createTitledBorder(raisedbevel,
+                                                               "Next Piece",
+                                                               TitledBorder.
+                                                               DEFAULT_JUSTIFICATION,
+                                                               TitledBorder.
+                                                               DEFAULT_POSITION,
+                                                               myFont.
+                                                               deriveFont(Font.PLAIN, 30f),
+                                                               Color.BLACK);
+        setBorder(BorderFactory.createCompoundBorder(titled, loweredbevel));
+    }
+    
+    /**
+     * Helper method to paint objects in my PaintComponent method.
+     * 
+     * @param theBlocks the 2D integer array of block coordinates passed to the method.
+     */
+    private void createNextPiece(final int[][] theBlocks) {
+        /*
+         * Step through myBlocks using the first index of the 2D array.  Using
+         * the [0] index and [1] index of this array, create a Rectangle2D and 
+         * make it the width of myBlockWidth and the height of the panel height divided
+         * by myBoardHeight subtracted from the total height of the panel.  (EX: panel
+         * is 800 pixels high, so 800 / the amount of tiles in the board: 20 so each row
+         * is 40 pixels high. Finally subtract that from 800 to get the blocks to fall 
+         * downward instead of up.)  Add each rectangle2D to myCurrentBlocks.        
+         */
+        for (int i = 0; i < theBlocks.length; i++) {
+            final int j = 0;
+            final int x = myBlockWidth + (theBlocks[i][j] * myBlockWidth);
+            //Bug where currentPeice falls one level more than they should.
+            final int y = myBlockHeight + (theBlocks[i][j + 1] * myBlockHeight);
+            
+            /*
+             * Since my code wants to start at bottom and fall upward, certain things have to 
+             * be coded oddly to reverse this behavior.  I have to have y bigger than the 
+             * negative of the block height, in order to display the piece at the top of the
+             * panel.
+             */
+            final Shape currentPieceBlock = new RoundRectangle2D.Double(x, y,
+                                                                        myBlockWidth,
+                                                                        myBlockHeight,
+                                                                        20,
+                                                                        20);
+            myNextBlocks.add(currentPieceBlock);
+            
+        }
+    }
+}

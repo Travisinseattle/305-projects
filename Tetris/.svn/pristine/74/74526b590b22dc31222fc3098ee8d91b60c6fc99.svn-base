@@ -1,0 +1,348 @@
+/*
+ * TCSS 305 Fall 2015
+ * Assignment 5 - PowerPaint.
+ */
+
+package view;
+import java.awt.BasicStroke;
+import java.awt.Color;
+import java.awt.Dimension;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.RenderingHints;
+import java.awt.Shape;
+import java.awt.geom.Rectangle2D;
+
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Observable;
+import java.util.Observer;
+
+import javax.swing.JPanel;
+
+import model.AbstractPiece;
+import model.Block;
+import model.Board;
+import model.Piece;
+
+/**
+ * @author Travis Holloway
+ * @version Assignment 6: Tetris, December 1 2015
+ */
+public class BoardPanel extends JPanel implements Observer {
+    
+    /**
+     * Auto-generated serial ID.
+     */
+    private static final long serialVersionUID = 4445276212311876100L;
+
+    /**
+     * Constant for minimum block width.
+     */
+    private static final int MIN_BLOCK_SIZE = 10;
+    
+    /**
+     * Constant to provide initial Width value for myBoard.
+     */
+    private static final int BOARD_WIDTH = 10;
+    
+    /**
+     * Constant to provide initial Height value for myBoard.
+     */
+    private static final int BOARD_HEIGHT = 20;
+    
+    /**
+     * Constant for starting panel width.
+     */
+    private static final int START_WIDTH = 400;
+    
+    /**
+     * Constant for starting panel height.
+     */
+    private static final int START_HEIGHT = 800;
+    
+    /**
+     * Constant for the background color.
+     */
+    private static final Color BACKGROUND_COLOR = Color.WHITE;
+    
+    /**
+     * Boolean field to provide reference to an option to paint a 
+     * grid on the Panel.
+     */
+    private boolean myGrid;
+    
+    /**
+     * Integer field to provide reference to the board width.
+     */
+    private int myBoardWidth;
+    
+    /**
+     * Integer field to provide reference to the board height.
+     */
+    private int myBoardHeight;
+    
+    /**
+     * Integer field to provide reference to the width of the blocks.
+     */
+    private int myBlockWidth;
+    
+    /**
+     * Integer field to provide reference to the height of the blocks.
+     */
+    private int myBlockHeight;
+    
+    /**
+     * Board field that provides reference to the current Board object.
+     */
+    private Board myBoard;
+    
+    /**
+     * Field for the list that holds the shapes that represent the current
+     * piece.  
+     */
+    private List<Shape> myCurrentBlocks;
+    
+    /**
+     * Field for the list that holds the shapes that represent all of the 
+     * fozen blocks.
+     */
+    private List<Shape> myFrozenBlocks;
+    
+    /**
+     * Constructor for the BoardPanel.  Initializes the JPanel and calls 
+     * the start() method to configure the panel.
+     */
+    public BoardPanel() {
+        super();
+        setBackground(BACKGROUND_COLOR);
+        configurePanel();
+    }
+    
+    /**
+     * Method to initialize the class fields and configure the JPanel.
+     */
+    private void configurePanel() {
+        //set the background and size.
+        myBoardWidth = BOARD_WIDTH;
+        myBoardHeight = BOARD_HEIGHT;
+        myGrid = true;
+        setMinimumSize(new Dimension(BOARD_WIDTH * MIN_BLOCK_SIZE,
+                                     BOARD_HEIGHT * MIN_BLOCK_SIZE));
+        setSize(new Dimension(START_WIDTH, START_HEIGHT));
+        myBlockWidth = getWidth() / myBoardWidth;
+        myBlockHeight = getHeight() / myBoardHeight;
+        myCurrentBlocks = new ArrayList<Shape>();
+        myFrozenBlocks = new ArrayList<Shape>();
+        //myBlocks = new int[4][2];
+        
+        /*
+         * Instantiate a new Board object.
+         */
+        myBoard = new Board(myBoardWidth, myBoardHeight);
+    }
+    
+    /**
+     * Getter for the Block Width.
+     * 
+     * @return The current width of the piece blocks.
+     */
+    public int getBlockWidth() {
+        return myBlockWidth;
+    }
+    
+    /**
+     * A getter to return the board created in BoardPanel.
+     * 
+     * @return returns the board object assigned to the BoardPanel.
+     */
+    public Board getBoard() {
+        return myBoard;
+    }    
+    
+    /**
+     * Setter for the Block Width.
+     * 
+     * @param theWidth The integer size that myBlockWidth will be set to.
+     */
+    public void setBlockWidth(final int theWidth) {
+        myBlockWidth = getWidth() / myBoardWidth;
+    }
+    
+    /**
+     * Setter for the Block Width.
+     * 
+     * @param theHeight The integer size that myBlockHeight will be set to.
+     */
+    public void setBlockHeight(final int theHeight) {
+        myBlockHeight = getHeight() / myBoardHeight;
+    }
+    
+    @Override
+    public void update(final Observable theObservable,
+                       final Object theObject) {
+        if (theObservable instanceof Board) {
+            repaint();
+        }
+    }
+    
+    /**
+     * Paints the current Board.
+     * 
+     * @param theGraphics The graphics context to use for painting.
+     */
+    public void paintComponent(final Graphics theGraphics) {
+        super.paintComponent(theGraphics);
+        final Graphics2D g2d = (Graphics2D) theGraphics;
+        
+        //clean up the display of the object.
+        g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
+                             RenderingHints.VALUE_ANTIALIAS_ON);
+        /*
+         * Get the current piece, and the frozen blocks. Re-instantiate the list
+         * of the Current piece's block shapes (myCurrentBlocks) to clear it.  Capture
+         * the piece's current coordinates in board coordinates and assign it to myBlocks.
+         */
+        final Piece currentPiece = myBoard.getCurrentPiece();
+        final List<Block[]> frozenList = myBoard.getFrozenBlocks();        
+        final int[][] blocks = ((AbstractPiece) currentPiece).getBoardCoordinates();
+        myCurrentBlocks = new ArrayList<Shape>();
+        myFrozenBlocks = new ArrayList<Shape>();
+        final int panelHeight = getHeight();
+        
+        //Call helper methods.        
+        createCurrentPiece(blocks);
+        createFrozenBlocks(frozenList);
+                
+        /*
+         * Paint each block in myCurrentBlocks.        
+         */
+        for (final Shape temp: myCurrentBlocks) {
+            g2d.setPaint(Color.RED);
+            g2d.fill(temp);
+        }
+        
+        for (final Shape temp: myFrozenBlocks) {
+            g2d.setPaint(Color.BLUE);
+            g2d.fill(temp);
+        }
+        
+        
+        /*
+         * If grid is clicked, draw a grid of lines that equals MyBoardWidth
+         * wide and myBoardHeight tall across the BoardPanel.
+         */
+        if (myGrid) {
+            int i;
+            final int width = getSize().width;
+            final int height = getSize().height;
+            
+            final int rows = myBoardHeight;
+            final int cols = myBoardWidth;
+
+            // draw the rows
+            final int rowHeight = myBlockHeight;
+            for (i = 0; i < rows; i++) {
+                g2d.setStroke(new BasicStroke(1));
+                g2d.setPaint(Color.BLACK);
+                g2d.drawLine(0, panelHeight - (i * rowHeight),
+                             width, panelHeight - (i * rowHeight));
+            }
+
+            // draw the columns
+            final int colWidth = myBlockWidth;
+            for (i = 0; i < cols; i++) {
+                g2d.setStroke(new BasicStroke(1));
+                g2d.setPaint(Color.BLACK);
+                g2d.drawLine(i * colWidth, 0, i * colWidth, height);
+            }
+        }
+    }
+    
+    /**
+     * Helper method to declare objects in my PaintComponent method.
+     * 
+     * @param theBlocks the 2D integer array of block coordinates passed to the method.
+     */
+    private void createCurrentPiece(final int[][] theBlocks) {
+        final int panelHeight = getHeight();
+        /*
+         * Step through myBlocks using the first index of the 2D array.  Using
+         * the [0] index and [1] index of this array, create a Rectangle2D and 
+         * make it the width of myBlockWidth and the height of the panel height divided
+         * by myBoardHeight subtracted from the total height of the panel.  (EX: panel
+         * is 800 pixels high, so 800 / the amount of tiles in the board: 20 so each row
+         * is 40 pixels high. Finally subtract that from 800 to get the blocks to fall 
+         * downward instead of up.)  Add each rectangle2D to myCurrentBlocks.        
+         */
+        for (int i = 0; i < theBlocks.length; i++) {
+            final int j = 0;
+            final int x = theBlocks[i][j] * myBlockWidth;
+            //Bug where currentPeice falls one level more than they should.
+            final int y = (panelHeight - myBlockHeight) - (theBlocks[i][j + 1]
+                            * myBlockHeight);
+            /*
+             * Since my code wants to start at bottom and fall upward, certain things have to 
+             * be coded oddly to reverse this behavior.  I have to have y bigger than the 
+             * negative of the block height, in order to display the piece at the top of the
+             * panel.
+             */
+            if (y  > -myBlockHeight) {
+                final Shape currentPieceBlock = new Rectangle2D.Double(x, y,
+                                                                       myBlockWidth,
+                                                                       myBlockHeight);
+                myCurrentBlocks.add(currentPieceBlock);
+            }
+        }
+    }
+    
+    /**
+     * Helper method to create a list of frozen blocks.
+     * 
+     * @param theFrozenList The Linked List of Block[] arrays that represent
+     * the frozen blocks on the board.
+     */
+    private void createFrozenBlocks(final List<Block[]> theFrozenList) {
+        //Store the height of the panel for use in sizing the blocks.
+        final int panelHeight = getHeight();
+        //Create a index so I can use it to decide where the block exists.
+        int frozenIndex = 1;
+        //Make an iterator to iterate through the frozen list.
+        final Iterator<Block[]> iter = theFrozenList.iterator();
+        while (iter.hasNext()) {
+            //store the current Block[] array to an object.
+            final Block[] temp = iter.next();
+            /*
+             * Multiply index by block height to find out where the array is 
+             * on the panel.  Subtract it from the panel height to have it read 
+             * top to bottom, instead of bottom to top.
+             */
+            final int y = panelHeight - (frozenIndex * myBlockHeight);
+            for (int j = 0; j < temp.length; j++) {
+                /*
+                 * Set the X coordinate to the index of temp times the width of
+                 * the blocks.
+                 */
+                final int x = j * myBlockWidth;
+                //Store the current Block to an object.
+                final Block tempBlock = temp[j];
+                /*
+                 * Provided that the block is not empty, create a Rectangle2D.Double
+                 * of it and store it to the myFrozenBlocks array, which will be iterated
+                 * through when it comes time to paint the frozen blocks.
+                 */
+                if (!(tempBlock.equals(Block.EMPTY))) {
+                    final Shape block = new Rectangle2D.Double(x, y,
+                                                              myBlockWidth,
+                                                              myBlockHeight);
+                    myFrozenBlocks.add(block);
+                }
+            }
+            //advance the index object.
+            frozenIndex++;
+        }
+    }
+    
+}
+

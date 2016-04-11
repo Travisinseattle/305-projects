@@ -1,0 +1,182 @@
+/*
+ * TCSS 305 Fall 2015
+ * Assignment 5 - PowerPaint.
+ */
+
+package view;
+import java.awt.Color;
+import java.awt.Dimension;
+
+import java.math.BigInteger;
+
+import javax.swing.JPanel;
+import javax.swing.JTextArea;
+
+import model.Board;
+
+/**
+ * @author Travis Holloway
+ * @version Assignment 6: Tetris, December 1 2015
+ */
+public class BoardPanel extends JPanel {
+    
+    /**
+     * Auto-generated serial ID.
+     */
+    private static final long serialVersionUID = 4445276212311876100L;
+
+    /**
+     * Constant for Panel Width.
+     */
+    private static final int BLOCK_WIDTH = 9;
+    
+    /**
+     * Constant to provide initial Width value for myBoard.
+     */
+    private static final int BOARD_WIDTH = 10;
+    
+    /**
+     * Constant to provide initial Height value for myBoard.
+     */
+    private static final int BOARD_HEIGHT = 20;
+    
+    /**
+     * Constant for the background color.
+     */
+    private static final Color BACKGROUND_COLOR = Color.BLACK;
+    
+    /**
+     * Integer field to provide reference to the board width.
+     */
+    private int myBoardWidth;
+    
+    /**
+     * Integer field to provide reference to the board height.
+     */
+    private int myBoardHeight;
+    
+    /**
+     * Integer field to provide reference to the size of the blocks.
+     */
+    private int myBlockWidth;
+    
+    /**
+     * JTextField field that provides reference to the JTextField that
+     * displays the toString of the board.
+     */
+    private JTextArea myField;
+    
+    /**
+     * Board field that provides reference to the current Board object.
+     */
+    private Board myBoard;
+
+    /**
+     * Constructor for the BoardPanel.  Initializes the JPanel and calls 
+     * the start() method to configure the panel.
+     */
+    public BoardPanel() {
+        super();
+        setSize(new Dimension(BLOCK_WIDTH * BOARD_WIDTH,
+                                     BLOCK_WIDTH * BOARD_HEIGHT));
+        setBackground(BACKGROUND_COLOR);
+        configurePanel();
+    }
+    
+    /**
+     * Method to initialize the class fields and configure the JPanel.
+     */
+    private void configurePanel() {
+        //set the background and size.
+        myBoardWidth = BOARD_WIDTH;
+        myBoardHeight = BOARD_HEIGHT;
+        myBlockWidth = BLOCK_WIDTH + 1; 
+        
+        /*
+         * Instantiate a new Board object.
+         */
+        myBoard = new Board(myBoardWidth, myBoardHeight);
+        
+    }
+    
+    /**
+     * Getter for the Block Width.
+     * 
+     * @return The current width of the piece blocks.
+     */
+    public int getBlockWidth() {
+        return myBlockWidth;
+    }
+    
+    /**
+     * Setter for the Block Width.
+     * 
+     * @param theWidth The integer size that myBlockWidth will be set to.
+     */
+    public void setBlockWidth(final int theWidth) {
+        //set default width to the block width, just to instantiate it.
+        int returnWidth = myBlockWidth;
+        /*
+         * Make sure myBlockWidth is still larger than the minimum (BLOCK_WIDTH)
+         * and if it is, run the changeBlock method.
+         */
+        if (myBlockWidth > BLOCK_WIDTH) {
+            returnWidth = changeBlock(theWidth); //call helper method. 
+        }
+        myBlockWidth = returnWidth;
+    }
+    
+    /**
+     * Helper method for setBlockWidth() that makes the block width larger.
+     * 
+     * @param theWidth The size of the int passed to setBlockWidth().
+     * @return returns the new block size.
+     */
+    private int changeBlock(final int theWidth) {
+        final BigInteger passedWidth = BigInteger.valueOf(theWidth);
+        //set an initial value for return that is the current size of the block.
+        int returnWidth = myBlockWidth;
+        
+        //modulate the passedWidth by the board width.
+        final BigInteger[] results = passedWidth.divideAndRemainder
+                        (new BigInteger(String.valueOf(myBoardWidth)));
+        int quotient = results[0].intValue();  //get the quotient.
+        /*
+         * If the quotient is bigger than the current block width, subtract current block
+         * width from quotient and then run for loop, increasing the block the number of 
+         * times of the difference.  If it is smaller than the current block size BUT still
+         * bigger than the constant BLOCK_WIDTH which is the minimum block size, then 
+         * subtract quotient from Block size and decrement the block by that amount.
+         */
+        if (quotient > myBlockWidth) {  //If quotient is bigger than current block size.
+            quotient = quotient - myBlockWidth;
+            for (int i = 0; i < quotient; i++) {
+                returnWidth++;
+            }
+        } else if (quotient < myBlockWidth && quotient > BLOCK_WIDTH) {
+            quotient = myBlockWidth - quotient;
+            for (int i = 0; i < quotient; i++) {
+                returnWidth--;
+            }
+        }
+        return returnWidth;
+    }
+    
+    
+//    /**
+//     * Paints the current Board.
+//     * 
+//     * @param theGraphics The graphics context to use for painting.
+//     */
+//    public void paintComponent(final Graphics theGraphics) {
+//        super.paintComponent(theGraphics);
+//        final Graphics2D g2d = (Graphics2D) theGraphics;
+//        
+//        //clean up the display of the object.
+//        g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
+//                             RenderingHints.VALUE_ANTIALIAS_ON);
+//        
+//    }
+    
+}
+

@@ -1,0 +1,129 @@
+/*
+ * TCSS 305 Fall 2015
+ * Assignment 5 - PowerPaint.
+ */
+
+package view;
+
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Dimension;
+import java.awt.FlowLayout;
+import java.awt.Font;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.io.PrintStream;
+
+import javax.swing.BoxLayout;
+import javax.swing.JPanel;
+import javax.swing.JTextArea;
+
+import model.Board;
+
+/**
+ * @author Travis Holloway
+ * @version Assignment 6: Tetris, December 1 2015
+ */
+public class BoardPanel extends JPanel {
+    
+    /**
+     * Auto-generated serial ID.
+     */
+    private static final long serialVersionUID = 4445276212311876100L;
+
+    /**
+     * Constant for Panel Width.
+     */
+    private static final int PANEL_WIDTH = 200;
+    
+    /**
+     * Constant for Panel Height.
+     */
+    private static final int PANEL_HEIGHT = 400;
+    
+    /**
+     * Constant to provide initial Width value for myBoard.
+     */
+    private static final int BOARD_WIDTH = 10;
+    
+    /**
+     * Constant to provide initial Height value for myBoard.
+     */
+    private static final int BOARD_HEIGHT = 20;
+    
+    /**
+     * Constant for the background color.
+     */
+    private static final Color BACKGROUND_COLOR = Color.BLACK;
+    
+    /**
+     * Integer field to provide reference to the board width.
+     */
+    private int myBoardWidth;
+    
+    /**
+     * Integer field to provide reference to the board height.
+     */
+    private int myBoardHeight;
+    
+    /**
+     * JTextField field that provides reference to the JTextField that
+     * displays the toString of the board.
+     */
+    private JTextArea myField;
+    
+    /**
+     * Board field that provides reference to the current Board object.
+     */
+    private Board myBoard;
+
+    /**
+     * Constructor for the BoardPanel.  Initializes the JPanel and calls 
+     * the start() method to configure the panel.
+     */
+    public BoardPanel() {
+        super();
+        configurePanel();
+    }
+    
+    /**
+     * Method to initialize the class fields and configure the JPanel.
+     */
+    private void configurePanel() {
+        //set the background and size.
+        //setPreferredSize(new Dimension(PANEL_WIDTH, PANEL_HEIGHT));
+        setBackground(BACKGROUND_COLOR);
+        myBoardWidth = BOARD_WIDTH;
+        myBoardHeight = BOARD_HEIGHT;
+        this.setLayout(new BorderLayout());
+        
+        
+        /*
+         * Instantiate a new Board object.
+         */
+        myBoard = new Board(myBoardWidth, myBoardHeight);
+        myField = new JTextArea(BOARD_HEIGHT, BOARD_WIDTH);
+        myField.setLineWrap(true);
+        myField.setWrapStyleWord(true);
+        myField.setFont(new Font("monospaced", Font.PLAIN, 12));
+        myField.append(myBoard.toString());
+        add(myField, BorderLayout.CENTER);
+    }
+    
+//    /**
+//     * Paints the current Board.
+//     * 
+//     * @param theGraphics The graphics context to use for painting.
+//     */
+//    public void paintComponent(final Graphics theGraphics) {
+//        super.paintComponent(theGraphics);
+//        final Graphics2D g2d = (Graphics2D) theGraphics;
+//        
+//        //clean up the display of the object.
+//        g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
+//                             RenderingHints.VALUE_ANTIALIAS_ON);
+//        
+//    }
+    
+}
+

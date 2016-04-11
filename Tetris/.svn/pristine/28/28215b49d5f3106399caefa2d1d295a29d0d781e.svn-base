@@ -1,0 +1,285 @@
+/*
+ * TCSS 305 Fall 2015
+ * Assignment 6 - Tetris.
+ */
+
+package view;
+
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.GridLayout;
+import java.awt.Image;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Observable;
+import java.util.Observer;
+
+import javax.swing.AbstractButton;
+import javax.swing.BoxLayout;
+import javax.swing.Icon;
+import javax.swing.ImageIcon;
+import javax.swing.JButton;
+import javax.swing.JDialog;
+import javax.swing.JLabel;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+
+import model.Board;
+
+/**
+ * This is the class that displays the Keys JPanel.
+ * 
+ * @author Travis Holloway
+ * @version Assignment 6: Tetris, December 1 2015
+ */
+public class KeyPanel extends Observable implements Observer {
+    
+    /*
+     * ***********************************   CONSTANTS    *************************************
+     */
+    
+    /**
+     * Constant for the height of the button.
+     */
+    private static final int BUTTON_HEIGHT = 35;
+    
+    /**
+     * Constant for the width of the button.
+     */
+    private static final int BUTTON_WIDTH = 32;
+    
+    /**
+     * Constant for how many columns to use in the grid layout.
+     */
+    private static final int COLUMNS = 3;
+    
+    /**
+     * Constant for how many rows to use in the grid layout.
+     */
+    private static final int ROWS = 4;
+    
+    /*
+     * *************************************   FIELDS    **************************************
+     */
+    
+    /**
+     * Field for the array of buttons used by the Class.
+     */
+    private int[] myButtons;
+    
+    /**
+     * Field to represent the JPanel of the class.
+     */
+    private final JPanel myPanel; 
+    
+    /*
+     * **********************************   CONSTRUCTORS    ***********************************
+     */
+
+    /**
+     * Constructor for KeyPanel.
+     */
+    public KeyPanel() {
+        super();
+        myPanel = new JPanel();
+        configurePanel();
+    }
+    
+    /*
+     * *********************************   PUBLIC METHODS    **********************************
+     */
+    
+    /**
+     * Getter for the KeyCode of a button.
+     * 
+     * @return Returns the integer that represents the KeyCode of the button based on the index
+     * of myButtons as determined by theType.
+     */
+    public int[] getCode() {
+        return myButtons.clone();
+    }
+    
+    /**
+     * Getter for the class's JPanel.
+     * 
+     * @return Returns the KeyPanel's JPanel.
+     */
+    public JPanel getPanel() {
+        return this.myPanel;
+    }
+    
+    /* (non-Javadoc)
+     * @see java.util.Observer#update(java.util.Observable, java.lang.Object)
+     */
+    @Override
+    public void update(final Observable theObservable,
+                       final Object theObject) {
+        if (theObservable instanceof Board) {
+            myPanel.repaint();
+        }
+    }
+    
+    /*
+     * ********************************   PRIVATE METHODS    *********************************
+     */
+    
+    /**
+     * Helper method to add the ActionListener to the button.
+     * 
+     * @param theButton The button passed to the method.
+     */
+    private void addListener(final JButton theButton) {
+        theButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(final ActionEvent theActionEvent) {
+                createPane(theButton, theActionEvent); 
+            }
+        });
+    }
+    
+    /**
+     * Method to initialize the class fields and configure the JPanel.
+     */
+    private void configurePanel() {
+        myPanel.setBackground(Color.LIGHT_GRAY);
+        myPanel.setLayout(new BoxLayout(myPanel, BoxLayout.X_AXIS));
+        
+        final JPanel padding = new JPanel();
+        padding.setBackground(Color.LIGHT_GRAY);
+        padding.setLayout(new GridLayout(ROWS, COLUMNS, 0, 0));        
+        createButtons(padding);
+        myPanel.add(padding, BorderLayout.CENTER);
+    }
+    
+    /**
+     * Helper method to create and add buttons to the Panel.
+     * 
+     * @param thePanel The panel that the buttons should be added to.
+     */
+    private void createButtons(final JPanel thePanel) {
+        
+        final JLabel leftLabel = new JLabel("Left", JLabel.CENTER);
+        final JLabel rightLabel = new JLabel("Right", JLabel.CENTER);
+        final JLabel downLabel = new JLabel("Down", JLabel.CENTER);
+        final JLabel dropLabel = new JLabel("Drop", JLabel.CENTER);
+        final JLabel rotateLabel = new JLabel("Rotate", JLabel.CENTER);
+        final JLabel pauseLabel = new JLabel("Pause", JLabel.CENTER);
+        
+        final List<JButton> buttons = new ArrayList<JButton>();
+        
+        
+        final TetrisButton leftButton = new TetrisButton(0, 37, new ImageIcon((Image)
+                                                       resizeIcon(new ImageIcon
+                                                       (".\\keyboard keys\\37.png"))));
+        final TetrisButton rightButton = new TetrisButton(1, 39, new ImageIcon((Image)
+                                                        resizeIcon(new ImageIcon
+                                                        (".\\keyboard keys\\39.png"))));
+        final TetrisButton downButton = new TetrisButton(2, 40, new ImageIcon((Image)
+                                                       resizeIcon(new ImageIcon
+                                                       (".\\keyboard keys\\40.png"))));
+        final TetrisButton dropButton = new TetrisButton(3, 38, new ImageIcon((Image)
+                                                       resizeIcon(new ImageIcon
+                                                       (".\\keyboard keys\\38.png"))));
+        final TetrisButton rotateButton = new TetrisButton(4, 82, new ImageIcon((Image)
+                                                         resizeIcon(new ImageIcon
+                                                         (".\\keyboard keys\\82.png"))));
+        final TetrisButton pauseButton = new TetrisButton(5, 80, new ImageIcon((Image)
+                                                        resizeIcon(new ImageIcon
+                                                        (".\\keyboard keys\\80.png"))));
+        buttons.add(leftButton);
+        buttons.add(rightButton);
+        buttons.add(downButton);
+        buttons.add(dropButton);
+        buttons.add(rotateButton);
+        buttons.add(pauseButton);
+        
+        //Initialize myButtons.
+        myButtons = new int[6];
+        
+        myButtons[0] = leftButton.getCode();
+        myButtons[1] = rightButton.getCode();
+        myButtons[2] = downButton.getCode();
+        myButtons[3] = dropButton.getCode();
+        myButtons[4] = rotateButton.getCode();
+        myButtons[5] = pauseButton.getCode();
+        
+        for (final JButton temp: buttons) {
+            temp.setBorderPainted(false);
+            temp.setBackground(null);
+            addListener(temp);
+        }
+        
+        
+        thePanel.add(leftLabel);
+        thePanel.add(rightLabel);
+        thePanel.add(downLabel);
+        thePanel.add(leftButton);
+        thePanel.add(rightButton);
+        thePanel.add(downButton);
+        thePanel.add(dropLabel);
+        thePanel.add(rotateLabel);
+        thePanel.add(pauseLabel);
+        thePanel.add(dropButton);
+        thePanel.add(rotateButton);
+        thePanel.add(pauseButton);
+    }
+    
+    /**
+     * Helper method for button action listener that configures the JOptionPane for each
+     * button action.
+     * 
+     * @param theButton The button whose actionListener this method configures.
+     * @param theActionEvent The ActionEvent of theButton.
+     */
+    private void createPane(final JButton theButton, final ActionEvent theActionEvent) {
+        final JOptionPane pane = new JOptionPane("Please press the "
+                        + "key you wish to assign",
+                        JOptionPane.INFORMATION_MESSAGE,
+                        JOptionPane.DEFAULT_OPTION,
+                        ((AbstractButton) theActionEvent.getSource()).getIcon(),
+                        new Object[]{},
+                        null);
+        final JDialog dialog = new JDialog();
+        dialog.setContentPane(pane);
+        dialog.setSize(myPanel.getWidth(), myPanel.getHeight());
+        dialog.setVisible(true);
+        dialog.setLocationRelativeTo(null);
+        dialog.addKeyListener(new KeyAdapter() {
+                public void keyPressed(final KeyEvent theKeyEvent) {
+                    final int code = theKeyEvent.getKeyCode();
+                    ((TetrisButton) theButton).setCode(code);
+                    final StringBuilder sb = new StringBuilder(".\\keyboard keys\\");
+                    sb.append(code);
+                    sb.append(".png");
+                    final String icon = sb.toString();
+                    theButton.setIcon(new ImageIcon((Image) 
+                                      resizeIcon(new ImageIcon(icon))));
+                    dialog.dispose();
+                    myButtons[((TetrisButton) theButton).getType()] =
+                                    ((TetrisButton) theButton).getCode();
+                    setChanged();
+                    notifyObservers();
+            }
+        });
+    }
+    
+    /**
+     * Helper method to mutate the Icons to the right size.
+     * 
+     * @param theIcon The Icon that needs resized.
+     * @return Returns a resized image of the new Icon.
+     */
+    private Image resizeIcon(final Icon theIcon) {
+        Image returnImage = ((ImageIcon) theIcon).getImage();
+        returnImage = returnImage.getScaledInstance(BUTTON_WIDTH,
+                                                    BUTTON_HEIGHT,
+                                                    java.awt.Image.SCALE_SMOOTH);
+        return returnImage;
+    }
+
+}
+

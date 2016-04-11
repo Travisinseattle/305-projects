@@ -1,0 +1,333 @@
+/*
+ * TCSS 305 Fall 2015
+ * Assignment 6 - Tetris.
+ */
+
+package view;
+
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Dimension;
+import java.awt.Image;
+import java.awt.KeyEventDispatcher;
+import java.awt.KeyboardFocusManager;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
+
+import javax.swing.Box;
+import javax.swing.BoxLayout;
+import javax.swing.Icon;
+import javax.swing.ImageIcon;
+import javax.swing.JFrame;
+import javax.swing.JPanel;
+import javax.swing.Timer;
+
+import model.Board;
+
+/**
+ * This is the class that the main JFrame.
+ * 
+ * @author Travis Holloway
+ * @version Assignment 6: Tetris, December 1 2015
+ */
+public class TetrisGUI extends JFrame {
+    
+    
+    
+    /**
+     *  The initial delay (in milliseconds) for the step timer. 
+     */
+    public static final int INITIAL_DELAY = 0;
+    
+    /** 
+     * The default delay (in milliseconds) for the move timer. 
+     */
+    public static final int MOVE_DELAY = 500;
+    
+    /**
+     * Constant for the size of the JFrame's border.
+     */
+    private static final int FRAME_BORDER = 10;
+    
+    /**
+     * Constant for how many panel's there are on the right side
+     * of the frame.  Used to determine height of the panels by
+     * dividing the board by the amount of panels.
+     */
+    private static final int PANELS = 3;
+    
+    /**
+     * Constant for the amount to add to size, used for a rounding algorithm. 
+     */
+    private static final int PLUS_AMOUNT = 5;
+    
+    /**
+     * Constant for the power of 10 that will be rounded to.  (10.0 for 10^1, 100.0
+     * for 10^2, etc).
+     */
+    private static final double ROUND_BY = 10.0;
+
+    /**
+     * Auto-generated serial required by class.
+     */
+    private static final long serialVersionUID = -4763324919600478629L;
+    
+    /**
+     * JFrame field that provides reference to the main JFrame container of
+     * Tetris.
+     */
+    private final JFrame myFrame;
+    
+    /**
+     * JPanel field that provides reference to the BoardPanel JPanel container.
+     */
+    private final BoardPanel myBoardPanel;
+    
+    /**
+     * Timer field that provides reference to the Timer used to animate the program.
+     */
+    private final Timer myTimer;
+    
+    /**
+     * A field for the left key.
+     */
+    private char myLeftKey;
+    
+    /**
+     * A field for the right key.
+     */
+    private char myRightKey;
+    
+    /**
+     * A field for the down key.
+     */
+    private char myDownKey;
+    
+    /**
+     * A field for the Drop key.
+     */
+    private char myDropKey;
+    
+    /**
+     * A field for the left key.
+     */
+    private char myPauseKey;
+    
+    /**
+     * A field for the rotate key.
+     */
+    private char myRotateKey;
+    
+    /**
+     * Field that provides a reference to the board in BoardPanel.
+     */
+    private final Board myBoard;
+    
+    /**
+     * Field that provides reference to boolean to indicate if the game
+     * is paused or not.
+     */
+    private boolean myPause;
+    
+    /**
+     * Field to represent the preview panel.
+     */
+    private PreviewPanel myPreview;
+    
+    /**
+     * Field to represent the Score panel.
+     */
+    private ScorePanel myScore;
+    
+    /**
+     * Field to represent the Key panel.
+     */
+    private KeyPanel myKeys;
+    
+    /**
+     * Field to represent the state of the current game.  If true, game is
+     * running, if false, game is over.
+     */
+    private boolean myGameOver;
+
+
+    /**
+     * Constructor for TetrisGui.  Calls super(), instantiates myFrame and
+     * myBoardPanel.
+     */
+    public TetrisGUI() {
+        super();
+        myFrame = new JFrame();
+        myBoardPanel = new BoardPanel();
+        myTimer = new Timer(MOVE_DELAY, new MoveListener());
+        myBoard = ((BoardPanel) myBoardPanel).getBoard();
+        myPause = false;
+        myGameOver = false;
+    }
+    
+    /**
+     * Method that provides fields to class constants and configures the class
+     * JFrame.
+     */
+    public void start() {
+        
+        /*
+         * Begin by adding a title to the JFrame, a default close operation, and 
+         * centering the JFrame.
+         */
+        myFrame.setTitle("Tetris");
+        
+        //Set the Icon for the Frame Title.
+        final Icon saveIcon = new ImageIcon(".\\icons\\Tetris.png");
+        final Image image = ((ImageIcon) saveIcon).getImage();
+        myFrame.setIconImage(image);
+        
+        //Call helper method to add containers.
+        addContainers();
+        
+        //Call helper method to assign keys.
+        assignKeys();
+        
+        //assign the key dispatcher, prevents loss of focus.
+        final KeyboardFocusManager manager = 
+                        KeyboardFocusManager.getCurrentKeyboardFocusManager();
+        manager.addKeyEventDispatcher(new TetrisKeyDispatcher());
+        
+      //Start the game.
+        myBoard.newGame(myBoard.getWidth(), myBoard.getHeight(), null);
+        
+        //Add observers to the Board in myBoardPanel.
+        myBoard.addObserver(myBoardPanel);
+        myBoard.addObserver(myPreview);
+        
+        //start the timer.
+        myTimer.start();
+        
+        /*
+         * Set the Default Close Operation. Pack the elements of myFrame. Set the minimum
+         * to the current size. Make the frame visible. Center it in the middle of
+         * the display.
+         */
+        myFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        myFrame.pack();
+        myFrame.setVisible(true);
+        myFrame.setLocationRelativeTo(null);
+    }
+    
+    /**
+     * Helper method for start() that adds the Containers to myFrame.
+     */
+    private void addContainers() {
+        final JPanel wrapper = new JPanel();
+        wrapper.setLayout(new BoxLayout(wrapper, BoxLayout.X_AXIS));
+        wrapper.setBackground(Color.GRAY);
+        wrapper.setPreferredSize(new Dimension((myBoardPanel.getWidth() * 2) + 20,
+                                               myBoardPanel.getHeight()));
+        
+        final JPanel right = new JPanel();
+        right.setLayout(new BoxLayout(right, BoxLayout.Y_AXIS));
+        right.setBackground(Color.GRAY);
+        
+        myPreview = new PreviewPanel(myBoardPanel);
+                
+        myScore = new ScorePanel(myBoardPanel);
+        
+        myKeys = new KeyPanel(myBoardPanel);
+
+        
+        right.add(myPreview);
+        right.add(Box.createVerticalStrut(FRAME_BORDER));
+        right.add(myScore);
+        right.add(Box.createVerticalStrut(FRAME_BORDER));
+        right.add(myKeys);
+        
+//        final JPanel boardWrapper = new JPanel();
+//        boardWrapper.setBackground(Color.BLACK);
+//        boardWrapper.add(myBoardPanel);
+        
+
+        wrapper.add(myBoardPanel);
+        wrapper.add(Box.createHorizontalStrut(FRAME_BORDER));
+        wrapper.add(right);
+        myFrame.add(wrapper, BorderLayout.CENTER);
+    }
+    
+    /**
+     * Helper method to assign keys.
+     */
+    private void assignKeys() {
+        myLeftKey = 'a';
+        myRightKey = 'd';
+        myDownKey = 's';
+        myDropKey = 'l';
+        myPauseKey = 'p';
+        myRotateKey = 'j';
+    }
+
+    
+    /**
+     * A class to control move events for the Timer.
+     * 
+     * @author Travis Holloway
+     * @version Assignment 5: PowerPaint, November 9 2015
+     */
+    private class MoveListener implements ActionListener {
+        @Override
+        public void actionPerformed(final ActionEvent theEvent) {
+            myGameOver = myBoard.isGameOver();
+            if (!myGameOver) {
+                myBoard.step();
+            }
+        }
+    }
+    
+  /**
+   * The key listener for the Tetris Program. 
+   * 
+   * @author Travis Holloway
+   * @version Assignment 5: PowerPaint, November 9 2015
+   */
+    public class TetrisKeyDispatcher implements KeyEventDispatcher {
+        @Override
+            public boolean dispatchKeyEvent(final KeyEvent theEvent) {
+            if (theEvent.getKeyChar() == myLeftKey) {
+                if (theEvent.getID() == KeyEvent.KEY_TYPED) {
+                    //Call moveLeft.
+                    myBoard.moveLeft();
+                }
+            } else if (theEvent.getKeyChar() == myRightKey) {
+                if (theEvent.getID() == KeyEvent.KEY_TYPED) {
+                    //Call moveLeft.
+                    myBoard.moveRight();
+                }
+            } else if (theEvent.getKeyChar() == myDownKey) {
+                if (theEvent.getID() == KeyEvent.KEY_TYPED) {
+                    //Call moveLeft.
+                    myBoard.moveDown();
+                }
+            } else if (theEvent.getKeyChar() == myDropKey) {
+                if (theEvent.getID() == KeyEvent.KEY_TYPED) {
+                    //Call moveLeft.
+                    myBoard.hardDrop();
+                }
+            } else if (theEvent.getKeyChar() == myRotateKey) {
+                if (theEvent.getID() == KeyEvent.KEY_TYPED) {
+                    //Call moveLeft.
+                    myBoard.rotate();
+                }
+            } else if (theEvent.getKeyChar() == myPauseKey) {
+                if (theEvent.getID() == KeyEvent.KEY_TYPED) {
+                  //bitwise boolean swap.
+                    myPause ^= true;
+                    if (myPause) {
+                        myTimer.stop();
+                    } else {
+                        myTimer.start();
+                    }  
+                }
+            }
+            return false;
+        }
+    }
+}

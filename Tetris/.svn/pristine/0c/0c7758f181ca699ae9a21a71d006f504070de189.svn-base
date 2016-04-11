@@ -1,0 +1,90 @@
+/*
+ * TCSS 305 Fall 2015
+ * Assignment 5 - PowerPaint.
+ */
+
+package view;
+
+import java.awt.BorderLayout;
+import java.awt.Image;
+import java.util.Observable;
+import java.util.Observer;
+
+import javax.swing.Icon;
+import javax.swing.ImageIcon;
+import javax.swing.JFrame;
+import javax.swing.JPanel;
+
+/**
+ * This is the main method of the PowerPaint program.  
+ * 
+ * @author Travis Holloway
+ * @version Assignment 5: PowerPaint, November 9 2015
+ */
+public class TetrisGUI extends JFrame implements Observer {
+
+    /**
+     * Auto-generated serial required by class.
+     */
+    private static final long serialVersionUID = -4763324919600478629L;
+    
+    /**
+     * JFrame field that provides reference to the main JFrame container of
+     * Tetris.
+     */
+    private final JFrame myFrame;
+    
+    /**
+     * JPanel field that provides reference to the BoardPanel JPanel container.
+     */
+    private final JPanel myBoardPanel;
+
+    /**
+     * 
+     */
+    public TetrisGUI() {
+        super();
+        myFrame = new JFrame();
+        myBoardPanel = new BoardPanel();
+    }
+    
+    /**
+     * Method that provides fields to class constants and configures the class
+     * JFrame.
+     */
+    public void start() {
+        /*
+         * Begin by adding a title to the JFrame, a default close operation, and 
+         * centering the JFrame.
+         */
+        myFrame.setTitle("Tetris");
+        myFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        
+        //Set the Icon for the Frame Title.
+        final Icon saveIcon = new ImageIcon(".\\icons\\Tetris.png");
+        final Image image = ((ImageIcon) saveIcon).getImage();
+        myFrame.setIconImage(image);
+        
+        //Add the Board Panel to the left of the JFrame.
+        myFrame.add(myBoardPanel, BorderLayout.WEST);
+        
+        /*
+         * Pack the elements of myFrame, set the minimum to the current size, make it
+         * visible, and center it in the middle of the display.
+         */
+        myFrame.pack();
+        myFrame.setMinimumSize(myBoardPanel.getSize());
+        myFrame.setVisible(true);
+        myFrame.setLocationRelativeTo(null);
+    }
+
+    /* (non-Javadoc)
+     * @see java.util.Observer#update(java.util.Observable, java.lang.Object)
+     */
+    @Override
+    public void update(final Observable theObservable,
+                       final Object theObject) {
+        // TODO Auto-generated method stub
+
+    }
+}

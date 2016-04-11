@@ -1,0 +1,225 @@
+/*
+ * TCSS 305 Fall 2015
+ * Assignment 6 - Tetris.
+ */
+
+package view;
+
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Dimension;
+import java.awt.Font;
+import java.awt.GridLayout;
+import java.awt.Image;
+
+import java.util.Observable;
+import java.util.Observer;
+
+import javax.swing.BorderFactory;
+import javax.swing.BoxLayout;
+import javax.swing.Icon;
+import javax.swing.ImageIcon;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.border.Border;
+import javax.swing.border.TitledBorder;
+
+import model.Board;
+
+/**
+ * This is the class that displays the Keys JPanel.
+ * 
+ * @author Travis Holloway
+ * @version Assignment 6: Tetris, December 1 2015
+ */
+public class KeyPanel extends JPanel implements Observer {
+    
+    /*
+     * ***********************************   CONSTANTS    *************************************
+     */
+
+    /**
+     * Auto-Generated Serial ID.
+     */
+    private static final long serialVersionUID = -5921137220616678665L;
+    
+    /**
+     * Constant for the width padding around the buttons.
+     */
+    private static final int BORDER = 10;
+    
+    /**
+     * Constant for the height of the button.
+     */
+    private static final int BUTTON_HEIGHT = 50;
+    
+    /**
+     * Constant for the width of the button.
+     */
+    private static final int BUTTON_WIDTH = 45;
+    
+    /**
+     * Constant for how many columns to use in the grid layout.
+     */
+    private static final int COLUMNS = 3;
+    
+    /**
+     * Constant for how many rows to use in the grid layout.
+     */
+    private static final int ROWS = 4;
+    
+    /**
+     * Constant for the width of the spacer between buttons.
+     */
+    private static final int SPACER = 30;
+    
+    /*
+     * *************************************   FIELDS    **************************************
+     */
+    
+    /**
+     * Field to represent the font used by the panel.
+     */
+    private final Font myFont;
+    
+    /*
+     * **********************************   CONSTRUCTORS    ***********************************
+     */
+
+    /**
+     * Constructor for KeyPanel.
+     * 
+     * @param theFont The font used by the program, stored in TetrisGui.
+     */
+    public KeyPanel(final Font theFont) {
+        super();
+        myFont = theFont;
+        configurePanel();
+    }
+    
+    /*
+     * *********************************   PUBLIC METHODS    **********************************
+     */
+    
+    /* (non-Javadoc)
+     * @see java.util.Observer#update(java.util.Observable, java.lang.Object)
+     */
+    @Override
+    public void update(final Observable theObservable,
+                       final Object theObject) {
+        if (theObservable instanceof Board) {
+            repaint();
+        }
+    }
+    
+    /*
+     * ********************************   PRIVATE METHODS    *********************************
+     */
+    
+    /**
+     * Method to initialize the class fields and configure the JPanel.
+     */
+    private void configurePanel() {
+        setBackground(Color.LIGHT_GRAY);
+        setLayout(new BoxLayout(this, BoxLayout.X_AXIS));
+        
+        /*
+         * Create 2 border objects. The raised border is the outer boarder and 
+         * will contain the title.  The lowered bevel is the inner boarder.
+         */
+        final Border raisedbevel = BorderFactory.createRaisedBevelBorder();
+        final Border loweredbevel = BorderFactory.createLoweredBevelBorder();
+        
+        /*
+         * Create a titled boarder using boarder factory.  
+         */
+        final Border titled = BorderFactory.createTitledBorder(raisedbevel,
+                                                               "Keys",
+                                                               TitledBorder.
+                                                               DEFAULT_JUSTIFICATION,
+                                                               TitledBorder.DEFAULT_POSITION,
+                                                               myFont.
+                                                               deriveFont(Font.PLAIN, 30f),
+                                                               Color.BLACK);
+        setBorder(BorderFactory.createCompoundBorder(titled, loweredbevel));
+        
+        final JPanel padding = new JPanel();
+        padding.setBackground(Color.LIGHT_GRAY);
+        padding.setLayout(new GridLayout(ROWS, COLUMNS, SPACER, BORDER));
+        padding.setBorder(BorderFactory.createEmptyBorder(BORDER, BORDER,
+                                                          BORDER, BORDER));        
+        createButtons(padding);
+        add(padding, BorderLayout.CENTER);
+    }
+    
+    /**
+     * Helper method to create and add buttons to the Panel.
+     * 
+     * @param thePanel The panel that the buttons should be added to.
+     */
+    private void createButtons(final JPanel thePanel) {
+        
+        final JLabel leftLabel = new JLabel("Left");
+        final JLabel rightLabel = new JLabel("Right");
+        final JLabel downLabel = new JLabel("Down");
+        final JLabel dropLabel = new JLabel("Drop");
+        final JLabel rotateLabel = new JLabel("Rotate");
+        final JLabel pauseLabel = new JLabel("Pause");
+        
+        
+        
+        final JLabel left = new JLabel(new ImageIcon((Image)
+                                                       resizeIcon(new ImageIcon
+                                                       (".\\keyboard keys\\a.png"))));
+        final JLabel right = new JLabel(new ImageIcon((Image)
+                                                        resizeIcon(new ImageIcon
+                                                        (".\\keyboard keys\\d.png"))));
+        final JLabel down = new JLabel(new ImageIcon((Image)
+                                                       resizeIcon(new ImageIcon
+                                                       (".\\keyboard keys\\s.png"))));
+        final JLabel drop = new JLabel(new ImageIcon((Image)
+                                                       resizeIcon(new ImageIcon
+                                                       (".\\keyboard keys\\l.png"))));
+        final JLabel rotate = new JLabel(new ImageIcon((Image)
+                                                         resizeIcon(new ImageIcon
+                                                         (".\\keyboard keys\\j.png"))));
+        final JLabel pause = new JLabel(new ImageIcon((Image)
+                                                        resizeIcon(new ImageIcon
+                                                        (".\\keyboard keys\\p.png"))));
+        
+        left.setSize(new Dimension(BUTTON_WIDTH, BUTTON_HEIGHT));
+        right.setSize(new Dimension(BUTTON_WIDTH, BUTTON_HEIGHT));
+        down.setSize(new Dimension(BUTTON_WIDTH, BUTTON_HEIGHT));
+        drop.setSize(new Dimension(BUTTON_WIDTH, BUTTON_HEIGHT));
+        rotate.setSize(new Dimension(BUTTON_WIDTH, BUTTON_HEIGHT));
+        pause.setSize(new Dimension(BUTTON_WIDTH, BUTTON_HEIGHT));
+        
+        thePanel.add(leftLabel);
+        thePanel.add(rightLabel);
+        thePanel.add(downLabel);
+        thePanel.add(left);
+        thePanel.add(right);
+        thePanel.add(down);
+        thePanel.add(dropLabel);
+        thePanel.add(rotateLabel);
+        thePanel.add(pauseLabel);
+        thePanel.add(drop);
+        thePanel.add(rotate);
+        thePanel.add(pause);
+    }
+    
+    /**
+     * Helper method to mutate the Icons to the right size.
+     * 
+     * @param theIcon The Icon that needs resized.
+     * @return Returns a resized image of the new Icon.
+     */
+    private Image resizeIcon(final Icon theIcon) {
+        Image returnImage = ((ImageIcon) theIcon).getImage();
+        returnImage = returnImage.getScaledInstance(BUTTON_WIDTH,
+                                                    BUTTON_HEIGHT,
+                                                    java.awt.Image.SCALE_SMOOTH);
+        return returnImage;
+    }
+}
+

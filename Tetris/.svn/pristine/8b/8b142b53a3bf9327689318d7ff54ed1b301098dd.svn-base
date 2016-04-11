@@ -1,0 +1,89 @@
+/*
+ * TCSS 305 Fall 2015
+ * Assignment 6 - Tetris.
+ */
+package view;
+
+import javax.swing.Icon;
+import javax.swing.JButton;
+
+/**
+ * This is an extended JButton class that allows the JButton to carry
+ * an integer which will represent which button it is. (left, right, etc.)
+ * 
+ * @author Travis Holloway
+ * @version Assignment 6: Tetris, December 1 2015
+ */
+public class TetrisButton extends JButton {
+    
+    /*
+     * ***********************************   CONSTANTS    *************************************
+     */
+    
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 4112418880012297316L;
+    
+    /*
+     * *************************************   FIELDS    **************************************
+     */
+    
+    /**
+     * Field to represent the KeyCode of the key associated with the button.
+     */
+    private int myCode;
+    
+    /**
+     * Field to represent the type of button.  (1 is left, 2 is right, 3 is down, 4 is drop,
+     * 5 is rotate, 6 is pause).
+     */
+    private final int myType;
+    
+    /*
+     * **********************************   CONSTRUCTORS    ***********************************
+     */
+    
+    /**
+     * Constructor for TetrisButton, takes an Icon that will be displayed
+     * as a JLabel.
+     * 
+     * @param theType an integer to represent what button it is.
+     * @param theCode and integer to represent the KeyCode of the key associated
+     * with the button.
+     * @param theIcon The Icon the Button will use for display.
+     */
+    public TetrisButton(final int theType, final int theCode, final Icon theIcon) {
+        super(theIcon);
+        myType = theType;
+        myCode = theCode;
+    }
+    
+    /*
+     * *********************************   PUBLIC METHODS    **********************************
+     */
+    
+    /**
+     * Getter for button type.
+     * 
+     * @return Returns the type of button as an integer.
+     */
+    public int getType() {
+        return this.myType;
+    }
+    
+    /**
+     * Setter for myCode which represents the KeyCode of the button.
+     * 
+     * @param theCode The integer value of the KeyCode that button represents.
+     */
+    public void setCode(final int theCode) {
+        this.myCode = theCode;
+    }
+    
+    /*
+     * *********************************   PRIVATE METHODS    *********************************
+     */
+    
+    
+}

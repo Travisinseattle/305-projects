@@ -1,0 +1,206 @@
+/*
+ * TCSS 305 Fall 2015
+ * Assignment 6 - Tetris.
+ */
+
+package view;
+
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
+import java.awt.event.WindowEvent;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Observable;
+import java.util.Observer;
+
+import javax.swing.JFrame;
+import javax.swing.JMenu;
+import javax.swing.JMenuBar;
+import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
+import javax.swing.Timer;
+
+import model.Board;
+
+/**
+ * This is the class configures and displays a menu at the top
+ * of the JFrame.
+ * 
+ * @author Travis Holloway
+ * @version Assignment 6: Tetris, December 1 2015
+ */
+public class TetrisMenu extends JMenuBar implements Observer {
+
+    /**
+     * Auto-Generated Serial ID.
+     */
+    private static final long serialVersionUID = -7196560764026132953L;
+    
+    /**
+     * Constant for the starting width of the board.
+     */
+    private static final int BOARD_WIDTH = 10;
+    
+    /**
+     * Constant for the starting height of the board.
+     */
+    private static final int BOARD_HEIGHT = 20;
+    
+    /**
+     * Field to provide reference to the current BoardPanel in use by the
+     * program.
+     */
+    private final BoardPanel myBoardPanel;
+    
+    /**
+     * Field to provide reference to the board in myBoardPanel.
+     */
+    private final Board myBoard;
+    
+    /**
+     * Field to provide reference to the JFrame of the program.
+     */
+    private final JFrame myFrame;
+    
+    /**
+     * Field to provide reference to the JFrame's Timer.
+     */
+    private final Timer myTimer;
+
+    /**
+     * The Constructor for the TetrisMenu, has the BoardPanel as a param
+     * in order to access methods and fields in the BoardPanel.
+     * 
+     * @param theBoardPanel The current BoardPanel in use by the program.
+     * @param theFrame The program's main JFrame.
+     * @param theTimer The timer used to animate the program.
+     */
+    public TetrisMenu(final BoardPanel theBoardPanel,
+                      final JFrame theFrame,
+                      final Timer theTimer) {
+        super();
+        myBoardPanel = theBoardPanel;
+        myBoard = myBoardPanel.getBoard();
+        myFrame = theFrame;
+        myTimer =  theTimer;
+        
+        //Create a list of menus.
+        final List<JMenu> menus = new ArrayList<JMenu>();
+        configureMenu(menus);
+        
+      //add list to the menu.
+        for (final JMenu list: menus) {
+            add(list);
+        }
+    }
+    
+    /**
+     * Method to configure the JMenuBar.
+     * 
+     * @param theMenu the List of menu's that contains all the main
+     * menu's of the JMenuBar.
+     */
+    private void configureMenu(final List<JMenu> theMenu) {
+        
+        theMenu.add(addFileMenu());
+        theMenu.add(addHelpMenu());
+    }
+    
+    /**
+     * Method to create and configure the File menu.
+     * 
+     * @return Returns a menu called File that holds NewGame, EndGame,
+     * and Exit menus.
+     */
+    private JMenu addFileMenu() {
+        //Create the Menu
+        final JMenu file = new JMenu("File");
+        file.setMnemonic(KeyEvent.VK_F);
+        
+        /*
+         * Create a NewGame button and add it to the File menu. Set the Mnemonic
+         * and set the action listener using a inner class.
+         */
+        final JMenuItem newGame = new JMenuItem("NewGame");
+        newGame.setMnemonic(KeyEvent.VK_N);
+        newGame.addActionListener(new ActionListener() {
+            public void actionPerformed(final ActionEvent theEvent) {
+                myBoard.newGame(BOARD_WIDTH, BOARD_HEIGHT, null);
+                myTimer.start();
+            }
+        });
+        
+        /*
+         * Create a EndGame button and add it to the File menu. Set the Mnemonic
+         * and set the action listener using a inner class.
+         */
+        final JMenuItem endGame = new JMenuItem("EndGame");
+        endGame.setMnemonic(KeyEvent.VK_N);
+        endGame.addActionListener(new ActionListener() {
+            public void actionPerformed(final ActionEvent theEvent) {
+                myBoardPanel.setGameState(true);
+                myTimer.stop();
+            }
+        });
+        
+        /*
+         * Create a exit button and add it to the File menu. Set the Mnemonic
+         * and set the action listener using a inner class.
+         */
+        final JMenuItem exit = new JMenuItem("Exit");
+        exit.setMnemonic(KeyEvent.VK_X);
+        exit.addActionListener(new ActionListener() {
+            public void actionPerformed(final ActionEvent theEvent) {
+                myFrame.dispatchEvent(new WindowEvent(myFrame,
+                                                       WindowEvent.WINDOW_CLOSING));
+            }
+        });
+        
+        file.add(newGame);
+        file.addSeparator();
+        file.add(endGame);
+        file.addSeparator();
+        file.add(exit);
+        //Return the File Menu.
+        return file;
+    }
+    
+    /**
+     * Method to create and configure the Help menu.
+     * 
+     * @return Returns a menu called About that pops a JMEssagePane with basic
+     * information about the program.
+     */
+    private JMenu addHelpMenu() {
+      //Create the Menu
+        final JMenu help = new JMenu("Help");
+        help.setMnemonic(KeyEvent.VK_H);
+        
+        //Create a Menu that pops a JOptionPane with information about the program.
+        final JMenuItem about = new JMenuItem("About...");
+        about.setMnemonic(KeyEvent.VK_A);
+        about.addActionListener(new ActionListener() {
+            public void actionPerformed(final ActionEvent theEvent) {
+                JOptionPane.showOptionDialog(about, "TCSS 305 Tetris, Autumn"
+                                             + " 2015\nWritten by Travis Holloway",
+                                             "About", JOptionPane.DEFAULT_OPTION,
+                                JOptionPane.QUESTION_MESSAGE, null, new Object[] {}, null);
+            }
+        });
+        help.add(about);
+        
+        return help;
+    }
+
+    /* (non-Javadoc)
+     * @see java.util.Observer#update(java.util.Observable, java.lang.Object)
+     */
+    @Override
+    public void update(final Observable theObservable, final Object theObject) {
+        // TODO Auto-generated method stub
+
+    }
+
+}

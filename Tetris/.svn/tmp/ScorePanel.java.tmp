@@ -1,0 +1,104 @@
+/*
+ * TCSS 305 Fall 2015
+ * Assignment 6 - Tetris.
+ */
+
+package view;
+
+import java.awt.Color;
+import java.awt.Dimension;
+import java.util.Observable;
+import java.util.Observer;
+
+import javax.swing.BorderFactory;
+import javax.swing.JPanel;
+import javax.swing.border.Border;
+
+import model.Board;
+
+/**
+ * This is the class that displays the Score JPanel.
+ * 
+ * @author Travis Holloway
+ * @version Assignment 6: Tetris, December 1 2015
+ */
+public class ScorePanel extends JPanel implements Observer {
+    
+    /**
+     * Auto-generated serial ID.
+     */
+    private static final long serialVersionUID = -428301323664751701L;
+    
+    /**
+     * Constant for the starting width of the panel.
+     */
+    private static final int WIDTH = 400;
+    
+    /**
+     * Constant for the starting height of the panel.
+     */
+    private static final int HEIGHT = 254;
+
+    /**
+     * Field that provides a reference to the Board passed to the 
+     * constructor.
+     */
+    private final BoardPanel myBoardPanel;
+    
+    /**
+     * Field that provides a reference to the Board that is being used by
+     * myBoardPanel.
+     */
+    private Board myBoard;
+
+    /**
+     * Constructor for ScorePanel.
+     * 
+     * @param theBoardPanel A reference to the Board from TetrisGUI.
+     */
+    public ScorePanel(final BoardPanel theBoardPanel) {
+        super();
+        myBoardPanel = theBoardPanel;
+        configurePanel();
+    }
+
+    /**
+     * Method to initialize the class fields and configure the JPanel.
+     */
+    private void configurePanel() {
+        myBoard = myBoardPanel.getBoard();
+        setSize(new Dimension(WIDTH, HEIGHT));
+        setBackground(Color.LIGHT_GRAY);
+        
+        final Border raisedbevel = BorderFactory.createRaisedBevelBorder();
+        final Border loweredbevel = BorderFactory.createLoweredBevelBorder();
+        
+<<<<<<< .mine
+        final Border titled = BorderFactory.createTitledBorder(raisedbevel,
+                                                               "Score",
+                                                               TitledBorder.
+                                                               DEFAULT_JUSTIFICATION,
+                                                               TitledBorder.
+                                                               DEFAULT_POSITION,
+                                                               new Font("monotype corsiva",
+                                                                        Font.PLAIN, 40),
+                                                               Color.BLACK);
+=======
+        final Border titled = BorderFactory.createTitledBorder(raisedbevel, "Score");
+>>>>>>> .r78
+        
+        setBorder(BorderFactory.createCompoundBorder(titled, loweredbevel));
+    }
+
+    /* (non-Javadoc)
+     * @see java.util.Observer#update(java.util.Observable, java.lang.Object)
+     */
+    @Override
+    public void update(final Observable theObservable,
+                       final Object theObject) {
+        if (theObservable instanceof Board) {
+            repaint();
+        }
+    }
+
+}

@@ -1,0 +1,101 @@
+/*
+ * TCSS 305 Fall 2015
+ * Assignment 6 - Tetris.
+ */
+
+package view;
+
+
+import java.awt.Color;
+import java.awt.Dimension;
+import java.awt.Font;
+import java.util.Observable;
+import java.util.Observer;
+
+import javax.swing.BorderFactory;
+import javax.swing.JPanel;
+import javax.swing.border.Border;
+import javax.swing.border.TitledBorder;
+
+import model.Board;
+
+/**
+ * This is the class that displays the Keys JPanel.
+ * 
+ * @author Travis Holloway
+ * @version Assignment 6: Tetris, December 1 2015
+ */
+public class KeyPanel extends JPanel implements Observer {
+
+    /**
+     * Auto-Generated Serial ID.
+     */
+    private static final long serialVersionUID = -5921137220616678665L;
+    
+    /**
+     * Constant for the starting width of the panel.
+     */
+    private static final int WIDTH = 400;
+    
+    /**
+     * Constant for the starting height of the panel.
+     */
+    private static final int HEIGHT = 254;
+    
+    /**
+     * Field that provides a reference to the Board passed to the 
+     * constructor.
+     */
+    private final BoardPanel myBoardPanel;
+    
+    /**
+     * Field that provides a reference to the Board that is being used by
+     * myBoardPanel.
+     */
+    private Board myBoard;
+
+    /**
+     * Constructor for KeyPanel.
+     * 
+     * @param theBoardPanel A reference to the Board from TetrisGUI.
+     */
+    public KeyPanel(final BoardPanel theBoardPanel) {
+        super();
+        myBoardPanel = theBoardPanel;
+        configurePanel();
+    }
+    
+    /**
+     * Method to initialize the class fields and configure the JPanel.
+     */
+    private void configurePanel() {
+        myBoard = myBoardPanel.getBoard();
+        setSize(new Dimension(WIDTH, HEIGHT));
+        setBackground(Color.LIGHT_GRAY);
+        
+        final Border raisedbevel = BorderFactory.createRaisedBevelBorder();
+        final Border loweredbevel = BorderFactory.createLoweredBevelBorder();
+        
+        final Border titled = BorderFactory.createTitledBorder(raisedbevel,
+                                                               "Keys",
+                                                               TitledBorder.
+                                                               DEFAULT_JUSTIFICATION,
+                                                               TitledBorder.DEFAULT_POSITION,
+                                                               new Font("times new roman",
+                                                                        Font.PLAIN, 40),
+                                                               Color.BLACK);
+        
+        setBorder(BorderFactory.createCompoundBorder(titled, loweredbevel));
+    }
+
+    /* (non-Javadoc)
+     * @see java.util.Observer#update(java.util.Observable, java.lang.Object)
+     */
+    @Override
+    public void update(final Observable theObservable,
+                       final Object theObject) {
+        if (theObservable instanceof Board) {
+            repaint();
+        }
+    }
+}

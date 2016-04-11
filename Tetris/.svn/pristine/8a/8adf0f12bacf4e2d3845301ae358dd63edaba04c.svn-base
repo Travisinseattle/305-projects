@@ -1,0 +1,162 @@
+/*
+ * TCSS 305 Fall 2015
+ * Assignment 5 - PowerPaint.
+ */
+
+package view;
+
+import java.awt.Color;
+import java.awt.Component;
+import java.awt.Dimension;
+import java.awt.Image;
+import java.awt.event.ComponentAdapter;
+import java.awt.event.ComponentEvent;
+
+import java.util.Observable;
+import java.util.Observer;
+
+import javax.swing.BoxLayout;
+import javax.swing.Icon;
+import javax.swing.ImageIcon;
+import javax.swing.JFrame;
+import javax.swing.JPanel;
+
+/**
+ * This is the main method of the PowerPaint program.  
+ * 
+ * @author Travis Holloway
+ * @version Assignment 5: PowerPaint, November 9 2015
+ */
+public class TetrisGUI extends JFrame implements Observer {
+    
+    /**
+     * Constant for the size of the JFrame's border.
+     */
+    private static final int FRAME_BORDER = 10;
+    
+    /**
+     * Constant for how many panel's there are on the right side
+     * of the frame.  Used to determine height of the panels by
+     * dividing the board by the amount of panels.
+     */
+    private static final int PANELS = 3;
+
+    /**
+     * Auto-generated serial required by class.
+     */
+    private static final long serialVersionUID = -4763324919600478629L;
+    
+    /**
+     * JFrame field that provides reference to the main JFrame container of
+     * Tetris.
+     */
+    private final JFrame myFrame;
+    
+    /**
+     * JPanel field that provides reference to the BoardPanel JPanel container.
+     */
+    private final BoardPanel myBoardPanel;
+
+    /**
+     * 
+     */
+    public TetrisGUI() {
+        super();
+        myFrame = new JFrame();
+        myBoardPanel = new BoardPanel();
+    }
+    
+    /**
+     * Method that provides fields to class constants and configures the class
+     * JFrame.
+     */
+    public void start() {
+      //Declare an integer to be used for determining the height of the right hand panels.
+        final int height = (myBoardPanel.getHeight() - FRAME_BORDER * 2) / PANELS;
+        /*
+         * Begin by adding a title to the JFrame, a default close operation, and 
+         * centering the JFrame.
+         */
+        myFrame.setTitle("Tetris");        
+        
+        //Set the Icon for the Frame Title.
+        final Icon saveIcon = new ImageIcon(".\\icons\\Tetris.png");
+        final Image image = ((ImageIcon) saveIcon).getImage();
+        myFrame.setIconImage(image);
+        
+        final JPanel wrapper = new JPanel();
+        wrapper.setLayout(new BoxLayout(wrapper, BoxLayout.X_AXIS));
+        wrapper.setBackground(Color.GRAY);
+        
+        final JPanel right = new JPanel();
+        right.setLayout(new BoxLayout(right, BoxLayout.Y_AXIS));
+        right.setBackground(Color.GRAY);
+        
+        final JPanel preview = new JPanel();
+        preview.setBackground(Color.BLUE);
+        
+        final JPanel score = new JPanel();
+        score.setBackground(Color.RED);
+        
+        final JPanel keys = new JPanel();
+        keys.setBackground(Color.GREEN);
+        
+        right.add(preview);
+        right.add(score);
+        right.add(keys);
+
+        wrapper.add(myBoardPanel);
+        wrapper.add(right);
+        myFrame.add(wrapper);
+        
+
+        System.out.println(myBoardPanel.getWidth() + "**");
+        System.out.println(preview.getWidth() + " /////");
+        
+        
+        System.out.println(myBoardPanel.getWidth());
+        
+        myBoardPanel.addComponentListener(new ComponentAdapter() 
+        {  
+            public void componentResized(final ComponentEvent theEvent) {
+                final Component c = (Component) theEvent.getSource();
+                myBoardPanel.setBlockWidth(c.getWidth());
+                System.out.println(c.getWidth() + " board width");
+                /*
+                 * Set the right panel sizes based on the width of myBoardPanel,
+                 * the for height, instantiate an integer that is the height of 
+                 * myBoardPanel divided by 3, minus the width of the 2 struts.
+                 */
+                final int height = (myBoardPanel.getHeight() - FRAME_BORDER * 2) / PANELS;
+                System.out.println(height + " right panel height");
+                System.out.println(right.getWidth() + " Right Width");
+                preview.setSize(new Dimension(myBoardPanel.getWidth(), height));
+                score.setSize(new Dimension(myBoardPanel.getWidth(), height));
+                keys.setSize(new Dimension(myBoardPanel.getWidth(), height));
+                repaint();
+            }
+        });
+        
+       
+        
+        /*
+         * Set the Default Close Operation. Pack the elements of myFrame. Set the minimum
+         * to the current size. Make the frame visible. Center it in the middle of
+         * the display.
+         */
+        myFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        myFrame.pack();
+        myFrame.setVisible(true);
+        myFrame.setLocationRelativeTo(null);
+    }
+
+    /* (non-Javadoc)
+     * @see java.util.Observer#update(java.util.Observable, java.lang.Object)
+     */
+    @Override
+    public void update(final Observable theObservable,
+                       final Object theObject) {
+        // TODO Auto-generated method stub
+
+    }
+}
